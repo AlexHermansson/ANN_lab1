@@ -14,7 +14,7 @@ class SLP():
 
         assert X.shape[0] == T.shape[0]
 
-        X = np.concatenate((np.ones(X.shape[0]).reshape(-1,1), X), axis = 1)
+        X = np.concatenate((np.ones(X.shape[0]), X), axis = 1)
 
         if learning_rule == 'delta':
             self.fit_delta(X, T, epochs, eta, sequential)
@@ -32,7 +32,7 @@ class SLP():
         E = np.zeros(epochs)
 
         if sequential:
-            for epoch in range(epochs):
+            for epoch in epochs:
 
                 # shuffle
                 change = np.arange(X.shape[0])
@@ -47,9 +47,6 @@ class SLP():
                     self.W = self.W + dW
                     # todo: maybe all dW will be zero?
 
-            plt.plot(np.arange(epochs), E)
-            plt.show()
-
         else: # batch instead
             for epoch in range(epochs):
                 Y = np.dot(X, self.W)
@@ -58,9 +55,6 @@ class SLP():
                 dW = -eta*X.T.dot((np.dot(X, self.W) - T))
                 self.W = self.W + dW
 
-            plt.plot(np.arange(epochs), E)
-            plt.show()
-
 
     def fit_perceptron(self, X, T, epochs, eta, sequential):
         """Train the weights with the perceptron learning rule"""
@@ -68,7 +62,7 @@ class SLP():
         E = np.zeros(epochs)
 
         if sequential:
-            for epoch in range(epochs):
+            for epoch in epochs:
 
                 # shuffle
                 change = np.arange(X.shape[0])
@@ -83,7 +77,7 @@ class SLP():
                     dW = -eta * x.reshape(1, -1).T.dot(y - t.reshape(1, -1))
                     self.W = self.W + dW
 
-            plt.plot(np.arange(epochs), E)
+            plt.plot(epochs, E)
             plt.show()
 
         else: # batch
@@ -97,7 +91,7 @@ class SLP():
                     break
                 self.W = self.W + dW
 
-            plt.plot(np.arange(epochs), E)
+            plt.plot(epochs, E)
             plt.show()
 
     def activation(self, z):
@@ -130,7 +124,5 @@ np.random.shuffle(change)
 X = X[change,:]
 T = T[change,:]
 
-slp=SLP(2,1)
-slp.fit(X,T,100,'delta',sequential=False)
-#plt.scatter(X[:,0], X[:,1])
-#plt.show()
+plt.scatter(X[:,0], X[:,1])
+plt.show()
