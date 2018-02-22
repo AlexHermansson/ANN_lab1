@@ -7,14 +7,14 @@ class SLP():
         """d is the dimension of the input and
         M is the dimension of the output."""
 
-        self.W = np.random.rand(d+1, M) # d+1 one since we add the bias term
+        self.W = (1- 2*np.random.rand(d+1, M)) # d+1 one since we add the bias term
 
 
     def fit(self, X, T, epochs, learning_rule = 'delta', eta = 0.1, sequential = False):
 
         assert X.shape[0] == T.shape[0]
 
-        X = np.concatenate((np.ones(X.shape[0]), X), axis = 1)
+        X = np.concatenate((np.ones(X.shape[0]).reshape(-1,1), X), axis = 1)
 
         if learning_rule == 'delta':
             self.fit_delta(X, T, epochs, eta, sequential)
@@ -32,7 +32,7 @@ class SLP():
         E = np.zeros(epochs)
 
         if sequential:
-            for epoch in epochs:
+            for epoch in range(epochs):
 
                 # shuffle
                 change = np.arange(X.shape[0])
@@ -47,6 +47,9 @@ class SLP():
                     self.W = self.W + dW
                     # todo: maybe all dW will be zero?
 
+            plt.plot(np.arange(epochs), E)
+            plt.show()
+
         else: # batch instead
             for epoch in range(epochs):
                 Y = np.dot(X, self.W)
@@ -55,6 +58,9 @@ class SLP():
                 dW = -eta*X.T.dot((np.dot(X, self.W) - T))
                 self.W = self.W + dW
 
+            plt.plot(np.arange(epochs), E)
+            plt.show()
+
 
     def fit_perceptron(self, X, T, epochs, eta, sequential):
         """Train the weights with the perceptron learning rule"""
@@ -62,7 +68,7 @@ class SLP():
         E = np.zeros(epochs)
 
         if sequential:
-            for epoch in epochs:
+            for epoch in range(epochs):
 
                 # shuffle
                 change = np.arange(X.shape[0])
@@ -77,7 +83,7 @@ class SLP():
                     dW = -eta * x.reshape(1, -1).T.dot(y - t.reshape(1, -1))
                     self.W = self.W + dW
 
-            plt.plot(epochs, E)
+            plt.plot(np.arange(epochs), E)
             plt.show()
 
         else: # batch
@@ -90,8 +96,9 @@ class SLP():
                     print('No update, break.')
                     break
                 self.W = self.W + dW
+                plot_boundary(self.W)
 
-            plt.plot(epochs, E)
+            plt.plot(np.arange(epochs), E)
             plt.show()
 
     def activation(self, z):
@@ -99,6 +106,15 @@ class SLP():
         return np.sign(z)
 
 
+def plot_boundary(w):
+    plt.scatter(X_1[:,0], X_1[:,1], c="r")
+    plt.scatter(X_2[:,0], X_2[:,1], c="b")
+    b=w[0]
+    w=w[1:]
+    w=[w[1],-w[0]]+b
+    plt.plot(w)
+    plt.axis([-5, 5, -5, 5])
+    plt.show()
 
 def data_3_1(mean, sigma, N = 100):
 
@@ -106,6 +122,9 @@ def data_3_1(mean, sigma, N = 100):
     X = np.random.multivariate_normal(mean, sigma, N)
     return X
 
+epochs=20
+d=2
+M=1
 N = 50
 mean_1 = np.array([1, 1])
 mean_2 = np.array([-1, -1])
@@ -124,5 +143,7 @@ np.random.shuffle(change)
 X = X[change,:]
 T = T[change,:]
 
-plt.scatter(X[:,0], X[:,1])
-plt.show()
+slp=SLP(d,M)
+slp.fit(X,T,epochs,'perceptron',sequential=False,eta=0.001)
+#plt.scatter(X[:,0], X[:,1])
+#plt.show()
