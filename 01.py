@@ -17,6 +17,7 @@ class SLP():
         assert X.shape[0] == T.shape[0]
 
         X = np.concatenate((np.ones(X.shape[0]).reshape(-1,1), X), axis = 1)
+        X, T = self.shuffle(X, T)
 
         if learning_rule == 'delta':
             self.fit_delta(X, T, epochs, eta, sequential)
@@ -162,11 +163,6 @@ T_2 = -np.ones(N).reshape(N, 1)
 
 X = np.concatenate((X_1, X_2), axis = 0)
 T = np.concatenate((T_1, T_2), axis = 0)
-
-change = np.arange(2*N)
-np.random.shuffle(change)
-X = X[change,:]
-T = T[change,:]
 
 slp=SLP(d, M)
 slp.fit(X, T, epochs, 'perceptron', sequential = True, eta = 0.001)
