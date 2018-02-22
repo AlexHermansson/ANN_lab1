@@ -47,6 +47,8 @@ class SLP():
                     self.W = self.W + dW
                 plot_boundary(self.W)
                     # todo: maybe all dW will be zero?
+                if epoch % 10 == 0:
+                    plot_boundary(self.W)
 
             plt.plot(np.arange(epochs), E)
             plt.show()
@@ -58,7 +60,10 @@ class SLP():
                 E[epoch] = error
                 dW = -eta*X.T.dot((np.dot(X, self.W) - T))
                 self.W = self.W + dW
-                plot_boundary(self.W)
+
+                if epoch % 10 == 0:
+                    plot_boundary(self.W)
+
 
             plt.plot(np.arange(epochs), E)
             plt.show()
@@ -84,7 +89,10 @@ class SLP():
                     y = self.activation(np.dot(x.reshape(1, -1), self.W))
                     dW = -eta * x.reshape(1, -1).T.dot(y - t.reshape(1, -1))
                     self.W = self.W + dW
-                plot_boundary(self.W)
+
+                if epoch % 10 == 0:
+                    plot_boundary(self.W)
+
 
             plt.plot(np.arange(epochs), E)
             plt.show()
@@ -97,9 +105,10 @@ class SLP():
                 dW =  -eta*X.T.dot(Y - T)
                 if dW.all() == 0:
                     print('No update, break.')
-                    break
+                    #break
                 self.W = self.W + dW
-                plot_boundary(self.W)
+                if epoch % 10 == 0:
+                    plot_boundary(self.W)
 
             plt.plot(np.arange(epochs), E)
             plt.show()
@@ -114,10 +123,19 @@ def plot_boundary(w):
     plt.scatter(X_2[:,0], X_2[:,1], c="b")
     b=w[0]
     w=w[1:]
-    w=[w[1],-w[0]]+b
-    plt.plot(w)
-    plt.axis([-5, 5, -5, 5])
+    #w=[w[1],-w[0]]+b
+    #plt.plot(w)
+    #plt.axis([-5, 5, -5, 5])
+    #plt.show()
+
+    funct = lambda x: np.dot(w.T, x) + b
+    xgrid = np.linspace(-5, 5)
+    ygrid = np.linspace(-4, 4)
+    grid = np.array([[funct(np.array([x, y])) for x in xgrid] for y in ygrid]).reshape(xgrid.shape[0], -1)
+    plt.contour(xgrid, ygrid, grid, 0)
+    plt.axis([-4, 4, -4, 4])
     plt.show()
+
 
 def data_3_1(mean, sigma, N = 100):
 
@@ -125,7 +143,7 @@ def data_3_1(mean, sigma, N = 100):
     X = np.random.multivariate_normal(mean, sigma, N)
     return X
 
-epochs=20
+epochs=100
 d=2
 M=1
 N = 50
@@ -146,7 +164,6 @@ np.random.shuffle(change)
 X = X[change,:]
 T = T[change,:]
 
-slp=SLP(d,M)
-slp.fit(X,T,epochs,'delta',sequential=False,eta=0.001)
-#plt.scatter(X[:,0], X[:,1])
-#plt.show()
+slp=SLP(d, M)
+slp.fit(X, T, epochs, 'perceptron', sequential = True, eta = 0.001)
+
