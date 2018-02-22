@@ -151,10 +151,18 @@ def data_3_1(mean, sigma, N = 100):
 epochs=100
 d=2
 M=1
-N = 50
-mean_1 = np.array([1, 1])
-mean_2 = np.array([-1, -1])
-sigma = np.identity(2)*0.2
+N = 100
+
+
+mean_1 = np.array([0.5, 0.5])
+mean_2 = np.array([-0.5, -0.5])
+
+# linearly separable data
+#sigma = np.identity(2)*0.2
+
+# non-linearly seperable data
+sigma = np.identity(2)*0.8
+
 
 X_1 = data_3_1(mean_1, sigma, N)
 T_1 = np.ones(N).reshape(N, 1)
@@ -165,4 +173,4 @@ X = np.concatenate((X_1, X_2), axis = 0)
 T = np.concatenate((T_1, T_2), axis = 0)
 
 slp=SLP(d, M)
-slp.fit(X, T, epochs, 'perceptron', sequential = True, eta = 0.001)
+slp.fit(X, T, epochs, 'delta', sequential = True, eta = 0.001)
