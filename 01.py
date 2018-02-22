@@ -45,6 +45,7 @@ class SLP():
                 for x, t in zip(X, T):
                     dW = -eta * x.reshape(1, -1).T.dot((np.dot(x.reshape(1, -1), self.W) - t.reshape(1,-1)))
                     self.W = self.W + dW
+                plot_boundary(self.W)
                     # todo: maybe all dW will be zero?
 
             plt.plot(np.arange(epochs), E)
@@ -57,6 +58,7 @@ class SLP():
                 E[epoch] = error
                 dW = -eta*X.T.dot((np.dot(X, self.W) - T))
                 self.W = self.W + dW
+                plot_boundary(self.W)
 
             plt.plot(np.arange(epochs), E)
             plt.show()
@@ -82,6 +84,7 @@ class SLP():
                     y = self.activation(np.dot(x.reshape(1, -1), self.W))
                     dW = -eta * x.reshape(1, -1).T.dot(y - t.reshape(1, -1))
                     self.W = self.W + dW
+                plot_boundary(self.W)
 
             plt.plot(np.arange(epochs), E)
             plt.show()
@@ -144,6 +147,6 @@ X = X[change,:]
 T = T[change,:]
 
 slp=SLP(d,M)
-slp.fit(X,T,epochs,'perceptron',sequential=False,eta=0.001)
+slp.fit(X,T,epochs,'delta',sequential=False,eta=0.001)
 #plt.scatter(X[:,0], X[:,1])
 #plt.show()
