@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class SLP():
+    """A single layer perceptron class. Can be trained with delta rule or perceptron
+    learning rule. With batch learning or sequential learning."""
 
     def __init__(self, d, M):
         """d is the dimension of the input and
@@ -35,17 +37,15 @@ class SLP():
             for epoch in range(epochs):
 
                 # shuffle
-                change = np.arange(X.shape[0])
-                np.random.shuffle(change)
-                X = X[change, :]
-                T = T[change, :]
+                X, T = self.shuffle(X, T)
                 Y = np.dot(X, self.W)
                 error = 0.5 * np.einsum('ij, ij', Y - T, Y - T)
                 E[epoch] = error
                 for x, t in zip(X, T):
                     dW = -eta * x.reshape(1, -1).T.dot((np.dot(x.reshape(1, -1), self.W) - t.reshape(1,-1)))
                     self.W = self.W + dW
-                    # todo: maybe all dW will be zero?
+
+                # In every 10th epoch, plot boundary
                 if epoch % 10 == 0:
                     plot_boundary(self.W)
 
@@ -59,9 +59,12 @@ class SLP():
                 E[epoch] = error
                 dW = -eta*X.T.dot((np.dot(X, self.W) - T))
                 self.W = self.W + dW
+
+                # In every 10th epoch, plot boundary
                 if epoch % 10 == 0:
                     plot_boundary(self.W)
 
+            # Plot graph of final error vs epochs
             plt.plot(np.arange(epochs), E)
             plt.show()
 
@@ -75,10 +78,7 @@ class SLP():
             for epoch in range(epochs):
 
                 # shuffle
-                change = np.arange(X.shape[0])
-                np.random.shuffle(change)
-                X = X[change,:]
-                T = T[change,:]
+                X, T = self.shuffle(X, T)
                 Y = self.activation(np.dot(X, self.W))
                 error = 0.5 * np.einsum('ij, ij ', Y - T, Y - T)
                 E[epoch] = error
@@ -86,9 +86,12 @@ class SLP():
                     y = self.activation(np.dot(x.reshape(1, -1), self.W))
                     dW = -eta * x.reshape(1, -1).T.dot(y - t.reshape(1, -1))
                     self.W = self.W + dW
+
+                # In every 10th epoch, plot boundary
                 if epoch % 10 == 0:
                     plot_boundary(self.W)
 
+            # Plot graph of final error vs epochs
             plt.plot(np.arange(epochs), E)
             plt.show()
 
@@ -102,38 +105,44 @@ class SLP():
                     print('No update, break.')
                     #break
                 self.W = self.W + dW
+
+                # In every 10th epoch, plot boundary
                 if epoch % 10 == 0:
                     plot_boundary(self.W)
 
+            # Plot graph of final error vs epochs
             plt.plot(np.arange(epochs), E)
             plt.show()
 
     def activation(self, z):
+        """A sign activation function."""
 
         return np.sign(z)
 
+    def shuffle(self, X, T):
+        """A small function to shuffle data."""
+        change = np.arange(X.shape[0])
+        np.random.shuffle(change)
+        return X[change, :], T[change, :]
 
 def plot_boundary(w):
+    #
     plt.scatter(X_1[:,0], X_1[:,1], c="r")
     plt.scatter(X_2[:,0], X_2[:,1], c="b")
     b=w[0]
     w=w[1:]
-    #w=[w[1],-w[0]]+b
-    #plt.plot(w)
-    #plt.axis([-5, 5, -5, 5])
-    #plt.show()
-
-    funct = lambda x: np.dot(w.T, x) + b
-    xgrid = np.linspace(-5, 5)
+    classify = lambda x: np.dot(w.T, x) + b
+    xgrid = np.linspace(-4, 4)
     ygrid = np.linspace(-4, 4)
-    grid = np.array([[funct(np.array([x, y])) for x in xgrid] for y in ygrid]).reshape(xgrid.shape[0], -1)
+    grid = np.array([[classify(np.array([x, y])) for x in xgrid] for y in ygrid]).reshape(xgrid.shape[0], -1)
+
+
     plt.contour(xgrid, ygrid, grid, 0)
     plt.axis([-4, 4, -4, 4])
     plt.show()
 
 
 def data_3_1(mean, sigma, N = 100):
-
 
     X = np.random.multivariate_normal(mean, sigma, N)
     return X
