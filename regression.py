@@ -1,5 +1,7 @@
 import numpy as np
+from datasets import gauss_data
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 class TLP():
     """Two layer perceptron class. d is the dimension of input,
@@ -30,8 +32,9 @@ class TLP():
         delta_hidden = np.dot(delta_out, self.V[1:].T)*self.d_activation(H[:,1:])
         return delta_out, delta_hidden
 
-    def fit(self, X, T, epochs, eta = 0.01, alpha = None, verbose = False):
+    def fit(self, X, T, epochs, eta = 0.01, alpha = None, verbose = False, plot = True):
         """Backprop algorithm."""
+
         E = np.zeros(epochs)
         X = np.concatenate((np.ones(X.shape[0]).reshape(-1, 1), X), axis=1)
         for epoch in range(epochs):
@@ -54,13 +57,18 @@ class TLP():
                 self.W = self.W - eta*np.dot(X.T, delta_hidden)
                 self.V = self.V - eta*np.dot(H.T, delta_out)
 
-            if epoch % 50 == 0:
-                plot_boundary(self.forward)
+        if plot:
+            plt.plot(np.arange(epochs), E)
+            plt.xlabel('Epochs')
+            plt.ylabel('MSE')
+            plt.show()
 
-        plt.plot(np.arange(epochs), E)
-        plt.xlabel('Epochs')
-        plt.ylabel('MSE')
-        plt.show()
+    def predict(self, X):
+
+        X = np.concatenate((np.ones(N).reshape(-1, 1), X), axis = 1)
+        H, H_star, O, O_star = self.forward(X)
+
+        return H, O
 
     def activation(self, z):
 
@@ -72,63 +80,27 @@ class TLP():
         return 0.5*(1 + a)*(1 - a)
 
 
-def plot_boundary(function):
-    #
-    plt.scatter(X_1[:,0], X_1[:,1], c="r")
-    plt.scatter(X_3[:,0], X_3[:,1], c="b")
+n=100
+N=n*n
+X, T = gauss_data(n)
 
-    xgrid = np.linspace(-4, 4)
-    ygrid = np.linspace(-4, 4)
-    grid = np.array([[function(np.array([1, x, y]).reshape(1,-1))[2] for x in xgrid] for y in ygrid]).reshape(xgrid.shape[0], -1)
+M = T.shape[1]
+d = X.shape[1]
+hidden_nodes = 5
+epochs = 1000
+eta = 0.01
 
-    plt.contour(xgrid, ygrid, grid, 0)
-    plt.axis([-4, 4, -4, 4])
-    plt.show()
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_surface(X[:,0].reshape(n,n), X[:,1].reshape(n,n), T.reshape(n,n))
+plt.show()
 
+tlp = TLP(d, M, hidden_nodes)
+tlp.fit(X, T, epochs, eta, plot = False)
 
-def data_3_1(mean, sigma, N = 100):
+_, Y = tlp.predict(X)
 
-    X = np.random.multivariate_normal(mean, sigma, N)
-    return X
-
-
-epochs=2000
-d=2
-M=1
-N = 100
-hidden_nodes=3
-
-
-mean_1 = np.array([0.5, 0.5])
-mean_2 = np.array([0.5, 0.5])
-
-# linearly separable data
-#sigma = np.identity(2)*0.2
-
-# non-linearly seperable data
-sigma_1 = np.identity(2)
-sigma_2 = np.identity(2)*0.01
-
-X_1 = data_3_1(mean_1, sigma_2, N)
-T_1 = np.ones(N).reshape(N, 1)
-X_2 = data_3_1(mean_2, sigma_2, N)*2
-T_2 = -np.ones(N).reshape(N, 1)
-
-t = np.linspace(0, 2*np.pi, N)
-r = 3
-x = mean_1[0] + r*np.cos(t)
-y = mean_1[1] + r*np.sin(t)
-X_3 = np.array([x, y]).T
-T_3 = -np.ones(N).reshape(N, 1)
-
-X = np.concatenate((X_1, X_3), axis = 0)
-T = np.concatenate((T_1, T_3), axis = 0)
-
-tlp=TLP(d,M,hidden_nodes)
-tlp.fit(X,T,epochs,0.01,0.9,True)
-
-
-from datasets import encoder_data
-
-X, T = encoder_data()
-print(X)
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_surface(X[:,0].reshape(n,n), X[:,1].reshape(n,n), Y.reshape(n,n))
+plt.show()
