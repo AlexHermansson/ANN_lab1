@@ -7,12 +7,13 @@ class TLP():
     """Two layer perceptron class. d is the dimension of input,
     M is the dimension of output and h is the number of hidden nodes."""
 
-    def __init__(self, d, M, nodes):
+    def __init__(self, d, M, nodes, regression = False):
 
-        self.W = np.random.rand(d+1, nodes)
-        self.V = np.random.rand(nodes+1, M)
+        self.W = (2*np.random.rand(d+1, nodes) - 1)
+        self.V = (2*np.random.rand(nodes+1, M) - 1)
         self.Theta = np.zeros([d+1, nodes])
         self.Psi = np.zeros([nodes+1, M])
+        self.regression = regression
 
     def forward(self, X):
 
@@ -20,15 +21,21 @@ class TLP():
         H = self.activation(H_star)
         H = np.concatenate((np.ones(X.shape[0]).reshape(-1, 1), H), axis = 1)
         O_star = np.dot(H, self.V)
-        O = self.activation(O_star)
+
+        if self.regression:
+            O = O_star
+        else:
+            O = self.activation(O_star)
 
         return H, H_star, O, O_star
 
 
-    def backward(self, T, O,H):
+    def backward(self, T, O, H):
 
-
-        delta_out = (O - T)*self.d_activation(O)
+        if self.regression:
+            delta_out = (O - T)
+        else:
+            delta_out = (O - T)*self.d_activation(O)
         delta_hidden = np.dot(delta_out, self.V[1:].T)*self.d_activation(H[:,1:])
         return delta_out, delta_hidden
 
@@ -61,12 +68,13 @@ class TLP():
             plt.plot(np.arange(epochs), E)
             plt.xlabel('Epochs')
             plt.ylabel('MSE')
+            plt.axis([0, epochs, 0, 2])
             plt.show()
 
     def predict(self, X):
 
         X = np.concatenate((np.ones(N).reshape(-1, 1), X), axis = 1)
-        H, H_star, O, O_star = self.forward(X)
+        H, _, O, _ = self.forward(X)
 
         return H, O
 
@@ -76,31 +84,39 @@ class TLP():
 
     def d_activation(self, a):
         """a is an activation from activation()"""
-        # todo: is this a good idea?
+
         return 0.5*(1 + a)*(1 - a)
 
 
-n=100
+n=20
 N=n*n
 X, T = gauss_data(n)
 
 M = T.shape[1]
 d = X.shape[1]
-hidden_nodes = 5
-epochs = 1000
-eta = 0.01
+hidden_nodes = 50
+epochs = 5000
+#eta = 1/N
+eta = 0.0001
+print(eta)
 
+
+# Train the model
+tlp = TLP(d, M, hidden_nodes, regression = True)
+tlp.fit(X, T, epochs, eta, plot = True)
+
+# Show the data
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.plot_surface(X[:,0].reshape(n,n), X[:,1].reshape(n,n), T.reshape(n,n))
+ax.plot_surface(X[:,0].reshape(n,n), X[:,1].reshape(n,n), T.reshape(n,n), cmap = 'inferno')
+plt.title('Original Gauss function')
 plt.show()
 
-tlp = TLP(d, M, hidden_nodes)
-tlp.fit(X, T, epochs, eta, plot = False)
-
+# Plot the approximated function
 _, Y = tlp.predict(X)
-
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.plot_surface(X[:,0].reshape(n,n), X[:,1].reshape(n,n), Y.reshape(n,n))
+ax.plot_surface(X[:,0].reshape(n,n), X[:,1].reshape(n,n), Y.reshape(n,n), cmap = 'inferno')
+plt.title('Approximated function, %i hidden nodes' %hidden_nodes)
+plt.savefig('Approx, %i hidden' %hidden_nodes)
 plt.show()

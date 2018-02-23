@@ -126,9 +126,3 @@ T = np.concatenate((T_1, T_3), axis = 0)
 
 tlp=TLP(d,M,hidden_nodes)
 tlp.fit(X,T,epochs,0.01,0.9,True)
-
-
-from datasets import encoder_data
-
-X, T = encoder_data()
-print(X)
