@@ -10,3 +10,5 @@ def encoder_data(N = 8):
 
     return [data, targets]
 
+
+
