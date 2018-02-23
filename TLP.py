@@ -34,7 +34,6 @@ class TLP():
 
     def fit(self, X, T, epochs, eta = 0.01, alpha = None, verbose = False):
         """Backprop algorithm."""
-
         E = np.zeros(epochs)
         X = np.concatenate((np.ones(X.shape[0]).reshape(-1, 1), X), axis=1)
         for epoch in range(epochs):
@@ -57,8 +56,8 @@ class TLP():
                 self.W = self.W - eta*np.dot(X.T, delta_hidden)
                 self.V = self.V - eta*np.dot(H.T, delta_out)
 
-            #if epoch % 500 == 0:
-        plot_boundary(self.forward)
+            if epoch % 50 == 0:
+                plot_boundary(self.forward)
 
         plt.plot(np.arange(epochs), E)
         plt.xlabel('Epochs')
