@@ -1,5 +1,6 @@
 from datasets import mackey_glass
 import numpy as np
+import matplotlib.pyplot as plt
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation
@@ -36,7 +37,17 @@ model.add(Dense(hidden_first, input_shape=(d,), activation='tanh', kernel_regula
 model.add(Dense(M))
 sgd = optimizers.SGD(lr=0.01, momentum=0.9) # add learning rate decay or nesterov momentum?
 model.compile(optimizer=sgd, loss='mean_squared_error')
-model.fit(X_train, T_train, batch_size=32, epochs=epochs, callbacks=[EarlyStopping()], verbose=2)
+#model.fit(X_train, T_train, batch_size=32, epochs=epochs, callbacks=[EarlyStopping()], verbose=2,validation_split=0.4)
+history=model.fit(X_train, T_train, batch_size=32, epochs=epochs, verbose=0,validation_split=0.4)
+
+
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'])
+plt.show()
 
 
 
