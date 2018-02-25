@@ -69,12 +69,13 @@ class TLP():
                 self.V = self.V - eta*np.dot(H.T, delta_out)
 
         if plot:
-            plt.plot(np.arange(epochs), E,'g')
-            plt.plot(np.arange(epochs), E_test, 'r')
+            plt.plot(np.arange(epochs), E, 'g', label = 'Training MSE')
+            plt.plot(np.arange(epochs), E_test, 'r', label = 'Test MSE')
+            plt.legend()
             plt.xlabel('Epochs')
             plt.ylabel('MSE')
             plt.axis([0, epochs, 0, 50])
-            plt.savefig('Training and test error')
+            #plt.savefig('Training and test error')
             plt.show()
 
     def predict(self, X):
@@ -137,5 +138,5 @@ ax = fig.add_subplot(111, projection='3d')
 ax.plot_wireframe(X[:,0].reshape(n,n), X[:,1].reshape(n,n), Y.reshape(n,n), cmap = 'inferno')
 ax.scatter(X_train[:, 0], X_train[:,1],T_train, c="r")
 plt.title('Approximated function, %i hidden nodes' %hidden_nodes)
-plt.savefig('Generalization test, %i hidden' %hidden_nodes)
+#plt.savefig('Generalization test, %i hidden' %hidden_nodes)
 plt.show()
