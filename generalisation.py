@@ -74,6 +74,7 @@ class TLP():
             plt.xlabel('Epochs')
             plt.ylabel('MSE')
             plt.axis([0, epochs, 0, 50])
+            plt.savefig('Training and test error')
             plt.show()
 
     def predict(self, X):
@@ -101,25 +102,26 @@ def shuffle(X, T):
 
 n=20
 N=n*n
-test=N//4*3
+train=50
 X, T = gauss_data(n)
 #X,T=shuffle(X,T)
 
-X_train=shuffle(X,T)[0][:test]
-T_train=shuffle(X,T)[1][:test]
+X_train,T_train=shuffle(X,T)
+X_train=X_train[:train]
+T_train=T_train[:train]
 
 M = T.shape[1]
 d = X.shape[1]
-hidden_nodes = 5
-epochs = 10000
+hidden_nodes = 20
+epochs = 5000
 #eta = 1/N
-eta = 0.0001
+eta = 0.001
 print(eta)
 
 
 # Train the model
 tlp = TLP(d, M, hidden_nodes, regression = True)
-tlp.fit(X_train, T_train, X,T, epochs, eta, plot = True)
+tlp.fit(X_train, T_train, X,T, epochs, eta,alpha=0.9, plot = True)
 
 # Show the data
 fig = plt.figure()
@@ -132,7 +134,8 @@ plt.show()
 _, Y = tlp.predict(X)
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.plot_surface(X[:,0].reshape(n,n), X[:,1].reshape(n,n), Y.reshape(n,n), cmap = 'inferno')
+ax.plot_wireframe(X[:,0].reshape(n,n), X[:,1].reshape(n,n), Y.reshape(n,n), cmap = 'inferno')
+ax.scatter(X_train[:, 0], X_train[:,1],T_train, c="r")
 plt.title('Approximated function, %i hidden nodes' %hidden_nodes)
-#plt.savefig('Approx, %i hidden' %hidden_nodes)
+plt.savefig('Generalization test, %i hidden' %hidden_nodes)
 plt.show()
