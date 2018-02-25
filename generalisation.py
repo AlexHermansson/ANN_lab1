@@ -52,7 +52,7 @@ class TLP():
             delta_out, delta_hidden = self.backward(T, O, H)
 
             E[epoch] = 0.5*np.einsum('ij, ij', O-T, O-T)
-            E[epoch] = 0.5*np.einsum('ij, ij', O_test-T_test, O_test-T_test)
+            E_test[epoch] = 0.5*np.einsum('ij, ij', O_test-T_test, O_test-T_test)
             if verbose and epoch%500==0:
                 print('error for iteration %i: %f' %(epoch ,E[epoch]))
                 print('TEST error for iteration %i: %f' % (epoch, E_test[epoch]))
@@ -111,9 +111,9 @@ T_train=shuffle(X,T)[1][:test]
 M = T.shape[1]
 d = X.shape[1]
 hidden_nodes = 5
-epochs = 5000
+epochs = 10000
 #eta = 1/N
-eta = 0.001
+eta = 0.0001
 print(eta)
 
 
