@@ -25,16 +25,21 @@ T_train = T[:-test_size]
 hidden_first = 10
 hidden_second = 5
 d = 5
-epochs = 10000
+M = 1
+epochs = 100
 b_size = X_train.shape[0]
 
 # two layer perceptron
 model = Sequential()
 reg = regularizers.l2(0.01)
-model.add(Dense(hidden_first, input_dim=(d,), activation='tanh', kernel_regularizer = reg)) # first hidden layer and also the dimensions of input layer
-sgd = optimizers.SGD(lr = 0.01, momentum = 0.9) # add learning rate decay or nesterov momentum?
-model.compile(optimizer = sgd, loss = 'mean_squared_error')
-model.fit(X_train, T_train, batch_size = b_size, epochs = epochs, callbacks = EarlyStopping)
+model.add(Dense(hidden_first, input_shape=(d,), activation='tanh', kernel_regularizer=reg)) # first hidden layer and also the dimensions of input layer
+model.add(Dense(M))
+sgd = optimizers.SGD(lr=0.01, momentum=0.9) # add learning rate decay or nesterov momentum?
+model.compile(optimizer=sgd, loss='mean_squared_error')
+model.fit(X_train, T_train, batch_size=32, epochs=epochs, callbacks=[EarlyStopping()], verbose=2)
+
+
+
 
 
 # three layer perceptron
