@@ -38,4 +38,4 @@ def mackey_glass():
         else:
             x[t+1] = x[t] + beta*x[t - tau]/(1 + x[t - tau]**n) - gamma*x[t]
 
-    return time, x
+    return x
