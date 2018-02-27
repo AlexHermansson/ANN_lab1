@@ -30,7 +30,7 @@ hidden_first = 15
 hidden_second = 10
 d = 5
 M = 1
-epochs = 5000
+epochs = 500
 b_size = X_train.shape[0]
 b_size_test=X_test.shape[0]
 lambd=0.000001
@@ -43,7 +43,7 @@ model.add(Dense(hidden_first, input_shape=(d,), activation='relu', kernel_regula
 model.add(Dense(M))
 sgd = optimizers.SGD(lr=0.01, momentum=0.9) # add learning rate decay or nesterov momentum?
 model.compile(optimizer=sgd, loss='mean_squared_error')
-history = model.fit(X_train, T_train_noise, batch_size=b_size, epochs=epochs, verbose=0)#, callbacks=[EarlyStopping(patience = 20)], validation_split=0.4)
+history = model.fit(X_train, T_train, batch_size=b_size, epochs=epochs, verbose=0)#, callbacks=[EarlyStopping(patience = 20)], validation_split=0.4)
 #history=model.fit(X_train, T_train, batch_size=b_size, epochs=epochs, verbose=0,validation_split=0.4)
 
 plt.plot(history.history['loss'],c="r")
@@ -65,10 +65,11 @@ print('test error: ', test_MSE)
 prediction=model.predict(X_train, verbose=2, batch_size=b_size_test)
 t_prediction=np.arange(prediction.size)
 
-plt.plot(t, y, 'r', label = 'Predicted series')
-plt.plot(t, T_train, 'b', label = 'Real series')
-plt.legend()
+#plt.plot(t, y, 'r', label = 'Predicted series')
+#plt.plot(t, T_train, 'b', label = 'Real series')
+#plt.legend()
 #plt.axis([400, 600, -2.5, 3])
+plt.plot(x[:1500])
 plt.show()
 
 '''plt.plot(t_prediction, prediction, 'r', label = 'Predicted series')
